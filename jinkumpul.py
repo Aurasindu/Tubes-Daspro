@@ -1,6 +1,6 @@
 import load
 import random
-jin_login = 'aura'
+
 
 if __name__ == "__main__": 
     # cek udh login blm
