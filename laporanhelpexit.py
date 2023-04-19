@@ -1,4 +1,6 @@
-# DISCLAIMER : File ini belum bisa di-run karena butuh variabel-variabel hasil load csv dll tapi algoritmanya sudah okay
+import globalvar
+import dynamic_array as DA
+import csv_handler as CS
 
 def myStrIn(str, el) :
     for i in range(len(str)) :
@@ -11,30 +13,15 @@ def candi_madeby(namajin) :
     # panjang data candi
     # akses ke data candi
     counter = 0
-    for i in range(length_candi_data) :
-        if candi_data[i][kolom_nama] == namajin :
+    for i in range(globalvar.candi_data.size) :
+        if globalvar.candi_data.content[i][0] == namajin :
             counter += 1
     return counter
 
-def myIndex(arr, el) :
-    for i in range(len(arr)) : # len(arr) masih butuh diimplementasikan dengan array
-        if arr[i] == el :
-            return i
-    return -1
-
-def csvColSearch(csv, col, el) :
-    # Fungsi untuk mencari no.baris dari suatu elemen yang diketahui kolomnya
-    id = myIndex(csv.content[0], col)
-    for i in range(csv.size) :
-        if csv[i][id] == el :
-            return i
-    return -1 # Mengembalikan -1 jika tidak ditemukan
-
 def get_harga_candi(id) :
-    # butuh candidata : matriks dari data candi
-    rowid = csvColSearch(candidata, "id", str(id))
-    datacandi = candidata[rowid]
-    return 10000 * int(datacandi[3]) + 15000 * int(datacandi[4]) + 7500 * int(datacandi[5])
+    rowid = CS.csvColSearch(globalvar.candi_data, "id", str(id))
+    datacandi = globalvar.candi_data.content[rowid]
+    return 10000 * int(datacandi[2]) + 15000 * int(datacandi[3]) + 7500 * int(datacandi[4])
 
 def laporanjin() : # F9
     # ~ Kebutuhan Fungsi ~
@@ -46,11 +33,11 @@ def laporanjin() : # F9
     # kolomrole dan kolomusername : Index yang menunjukkan kolom data tersebut apabila csv diload dalam struktur data matriks
     #                               (apabila tidak dapat disesuaikan)
 
-    if loggedin :
+    if not globalvar.loggedin :
         print("Login terlebih dahulu sebelum menggunakan command!")
         return
 
-    if role != "bandung_bondowoso" :
+    if globalvar.role != "bandung_bondowoso" :
         print("Anda tidak berhak untuk mendapat laporan jin!")
         return
     
@@ -63,13 +50,13 @@ def laporanjin() : # F9
     rajin_count = 0
     malas_count = 0
 
-    for i in range(length_userdata) :
-        if user_data[i][kolomrole] == "jin_pengumpul" :
+    for i in range(globalvar.user_data.size) :
+        if globalvar.user_data.content[i][2] == "jin_pengumpul" :
             counter_jink += 1
-        elif user_data[i][kolomrole] == "jin_pembangun" :
+        elif globalvar.user_data.content[i][2] == "jin_pembangun" :
             counter_jinb += 1
-            candi_built = candi_madeby(user_data.content[i][1])
-            uname_jin = user_data[i][kolomuser]
+            candi_built = candi_madeby(globalvar.user_data.content[i][1])
+            uname_jin = globalvar.user_data.content[i][0]
             if candi_built > rajin_count :
                 jin_rajin = uname_jin
                 rajin_count = candi_built
@@ -83,7 +70,7 @@ def laporanjin() : # F9
                 jin_malas = uname_jin
                 malas_count = candi_built
 
-    print(f'Total jin: {jumlah_jin}')
+    print(f'Total jin: {globalvar.user_data.size - 2}')
     print(f'Total Jin Pengumpul: {counter_jink}')
     print(f'Total Jin Pembangun: {counter_jinb}')
     if counter_jinb == 0 :
@@ -92,9 +79,9 @@ def laporanjin() : # F9
     else :
         print(f'Jin Terajin: {jin_rajin}')
         print(f'Jin Termalas: {jin_malas}')
-    print(f'Jumlah Pasir: {jumlah_pasir}')
-    print(f'Jumlah Batu: {jumlah_batu}')
-    print(f'Jumlah Air: {jumlah_air}')
+    print(f'Jumlah Pasir: {globalvar.jumlah_pasir()}')
+    print(f'Jumlah Batu: {globalvar.jumlah_batu()}')
+    print(f'Jumlah Air: {globalvar.jumlah_air()}')
 
 def laporancandi() : #F10
      # ~ Kebutuhan Fungsi ~
@@ -107,11 +94,11 @@ def laporancandi() : #F10
     # kolompasir, batu, air : Index yang menunjukkan kolom data tersebut apabila csv diload dalam struktur data matriks
     #                         (apabila tidak dapat disesuaikan)
 
-    if loggedin :
+    if not globalvar.loggedin :
         print("Login terlebih dahulu sebelum menggunakan command!")
         return
 
-    if role != "bandung_bondowoso" :
+    if globalvar.role != "bandung_bondowoso" :
         print("Anda tidak berhak untuk mendapat laporan candi!")
         return
 
@@ -124,14 +111,14 @@ def laporancandi() : #F10
     harga_mahal = 0
     harga_murah = 0
 
-    for i in range(length_candidata) :
-        datacandi = candi_data[i]
+    for i in range(1, globalvar.candi_data.size) :
+        datacandi = globalvar.candi_data.content[i]
         t_candi += 1
-        t_pasir += int(datacandi[kolompasir])
-        t_batu += int(datacandi[kolombatu])
-        t_air += int(datacandi[kolomair])
+        t_pasir += int(datacandi[2])
+        t_batu += int(datacandi[3])
+        t_air += int(datacandi[4])
 
-        id = candi_data[i][kolomid]
+        id = globalvar.candi_data.content[i][0]
 
         if get_harga_candi(id) > harga_mahal :
             harga_mahal = get_harga_candi(id)
@@ -155,11 +142,11 @@ def laporancandi() : #F10
 def help() : # F15
     # Butuh : variabel loggedin yang menunjukkan status program (sudah ter login atau belum)
     #         variabel role yang menunjukkan role user yang terlogin saat itu
-    if loggedin :
+    if not globalvar.loggedin :
         print("="*8 + " HELP " + "="*8)
         print("1. login \n Command untuk login ke akun yang sudah terdaftar")
     else :
-        if role == "bandung_bondowoso" :
+        if globalvar.role == "bandung_bondowoso" :
             print("="*8 + " HELP " + "="*8)
             print("1. logout \n Command untuk logout/keluar dari akun")
             print("2. summonjin \n Command untuk men-summon satu jin")
@@ -171,17 +158,17 @@ def help() : # F15
             print("8. laporancandi \n Command untuk mendapatkan laporan mengenai progress pembuatan candi")
             print("9. save \n Command untuk menyimpan progress ke dalam file eksternal")
             print("10. exit \n Command untuk keluar dari program")
-        elif role == "jin_pembangun" :
+        elif globalvar.role == "jin_pembangun" :
             print("="*8 + " HELP " + "="*8)
             print("1. logout \n Command untuk logout/keluar dari akun")
             print("2. bangun \n Command untuk membangun sebuah candi")
             print("3. exit \n Command untuk keluar dari program")
-        elif role == "jin_pengumpul" :
+        elif globalvar.role == "jin_pengumpul" :
             print("="*8 + " HELP " + "="*8)
             print("1. logout \n Command untuk logout/keluar dari akun")
             print("2. kumpul \n Command untuk mengumpulkan bahan-bahan pembuatan candi")
             print("3. exit \n Command untuk keluar dari program")
-        elif role == "roro_jonggrang" :
+        elif globalvar.role == "roro_jonggrang" :
             print("="*8 + " HELP " + "="*8)
             print("1. logout \n Command untuk logout/keluar dari akun")
             print("2. hancurkancandi \n Command untuk menghancurkan salah satu candi")
@@ -199,4 +186,5 @@ def gameexit() : # F16
     
     if myStrIn("Yy", askSave) :
         # ~ Command save di sini ~
+        pass
     exit()
