@@ -13,7 +13,7 @@ def kataAwal(nomor):
 
 # Mencari apakah usernamenya sudah diambil atau belum
 def ketemu(username):
-    if csvColSearch ("user.csv","Password",username) != -1: # Manggil fungsi csvColSearch yang di csvhandler.py sorry kalau salah pemakaiannya
+    if csvColSearch ("user.csv","Username",username) != -1: # Manggil fungsi csvColSearch yang di csvhandler.py sorry kalau salah pemakaiannya
         return True
     else:
         return False
